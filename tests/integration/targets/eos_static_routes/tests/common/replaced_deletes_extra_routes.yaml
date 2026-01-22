@@ -45,8 +45,10 @@
       - result.changed == true
       - "'no ip route 192.168.2.0/24 Management1' in result.commands"
       - "'no ip route 192.168.3.0/24 Management1' in result.commands"
-      - "'ip route 192.168.1.0/24 Management1' in result.commands"
-    fail_msg: "BUG: state replaced should delete routes not in want config"
+      # Note: 192.168.1.0/24 was already present from setup, so a correct
+      # implementation should NOT need to re-add it; instead we validate final state below.
+      - "'no ip route 192.168.1.0/24 Management1' not in result.commands"
+    fail_msg: "BUG: state replaced should delete routes not in want config (and must not delete desired routes)"
     success_msg: "Routes not in want config are correctly deleted"
 
 - become: true
