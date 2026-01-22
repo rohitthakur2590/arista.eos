@@ -47,7 +47,7 @@
       - "'no ip route 192.168.3.0/24 Management1' in result.commands"
       - "'ip route 192.168.1.0/24 Management1' in result.commands"
     fail_msg: "BUG: state replaced should delete routes not in want config"
-    success_msg: "Fix works! Routes not in want config are correctly deleted"
+    success_msg: "Routes not in want config are correctly deleted"
 
 - become: true
   arista.eos.eos_facts:
@@ -55,13 +55,13 @@
 
 - name: Verify device configuration - only 192.168.1.0/24 should remain
   ansible.builtin.set_fact:
-    remaining_routes: "{{ ansible_facts.network_resources.static_routes | 
-      selectattr('vrf', 'equalto', none) | list | 
-      map(attribute='address_families') | list | 
-      flatten | 
-      selectattr('afi', 'equalto', 'ipv4') | 
-      map(attribute='routes') | list | 
-      flatten | 
+    remaining_routes: "{{ ansible_facts.network_resources.static_routes |
+      selectattr('vrf', 'equalto', none) | list |
+      map(attribute='address_families') | list |
+      flatten |
+      selectattr('afi', 'equalto', 'ipv4') |
+      map(attribute='routes') | list |
+      flatten |
       map(attribute='dest') | list }}"
 
 - ansible.builtin.assert:
