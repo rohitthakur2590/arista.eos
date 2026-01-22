@@ -58,7 +58,8 @@
 - name: Verify device configuration - only 192.168.1.0/24 should remain
   ansible.builtin.set_fact:
     remaining_routes: "{{ ansible_facts.network_resources.static_routes |
-      selectattr('vrf', 'equalto', none) | list |
+      # Global/static routes in EOS facts often omit the 'vrf' key entirely.
+      rejectattr('vrf', 'defined') | list |
       map(attribute='address_families') | list |
       flatten |
       selectattr('afi', 'equalto', 'ipv4') |
