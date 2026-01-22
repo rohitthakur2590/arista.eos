@@ -264,9 +264,15 @@ class TestEosStaticRoutesModule(TestEosModule):
                                 afi="ipv4",
                                 routes=[
                                     dict(
-                                        dest="10.1.1.0/24",
+                                        dest="0.0.0.0/0",
                                         next_hops=[
-                                            dict(interface="Management1"),
+                                            dict(interface="172.16.16.1"),
+                                        ],
+                                    ),
+                                    dict(
+                                        dest="10.10.0.0/16",
+                                        next_hops=[
+                                            dict(interface="172.16.16.1"),
                                         ],
                                     ),
                                 ],
@@ -277,15 +283,23 @@ class TestEosStaticRoutesModule(TestEosModule):
                 state="replaced",
             ),
         )
-        # Device has: 10.1.1.0/24, 120.1.1.0/24 (vrf testvrf), 1000:10::/64 (ipv6)
-        # Want: only 10.1.1.0/24
-        # Expected: Delete 1000:10::/64 (ipv6 route in same scope but not in want)
-        # Note: 120.1.1.0/24 is in different VRF, so it should NOT be deleted
+        # Use a fixture that includes extra IPv4 routes in the global table.
+        # - Device has (global IPv4): 0.0.0.0/0, 10.10.0.0/16, 10.1.1.2/32, 10.0.0.0/8
+        # - Want (global IPv4): 0.0.0.0/0, 10.10.0.0/16
+        # Expected: delete the extra IPv4 routes not in want.
+        #
+        # NOTE: 'replaced' is scoped; it should not delete:
+        # - IPv6 routes when want only specifies ipv4
+        # - VRF-scoped routes when want is global (vrf is None)
         commands = [
-            "ip route 10.1.1.0/24 Management1",
-            "no ipv6 route 1000:10::/64 Ethernet1 67 tag 98",
+            "no ip route 10.0.0.0/8 10.1.1.1",
+            "no ip route 10.1.1.2/32 172.16.16.1",
         ]
-        self.execute_module(changed=True, commands=commands)
+        self.execute_module(
+            changed=True,
+            commands=commands,
+            filename="eos_static_routes_issue532.cfg",
+        )
 
     def test_eos_static_routes_replaced_deletes_multiple_routes(self):
         """Test that state replaced deletes multiple routes not in want config"""
@@ -298,23 +312,15 @@ class TestEosStaticRoutesModule(TestEosModule):
                                 afi="ipv4",
                                 routes=[
                                     dict(
-                                        dest="10.1.1.0/24",
+                                        dest="0.0.0.0/0",
                                         next_hops=[
-                                            dict(interface="Management1"),
+                                            dict(interface="172.16.16.1"),
                                         ],
                                     ),
-                                ],
-                            ),
-                            dict(
-                                afi="ipv6",
-                                routes=[
                                     dict(
-                                        dest="1000:10::/64",
+                                        dest="10.10.0.0/16",
                                         next_hops=[
-                                            dict(
-                                                interface="Ethernet1",
-                                                admin_distance=55,
-                                            ),
+                                            dict(interface="172.16.16.2"),
                                         ],
                                     ),
                                 ],
@@ -325,15 +331,20 @@ class TestEosStaticRoutesModule(TestEosModule):
                 state="replaced",
             ),
         )
-        # Device has: 10.1.1.0/24, 1000:10::/64 (with admin_distance 67, tag 98)
-        # Want: 10.1.1.0/24, 1000:10::/64 (with admin_distance 55, no tag)
-        # Expected: Delete old 1000:10::/64 and add new one
+        # Fixture includes extra IPv4 routes and an existing 10.10.0.0/16 next hop.
+        # Want changes 10.10.0.0/16 next hop from 172.16.16.1 -> 172.16.16.2,
+        # and should delete the extra IPv4 routes not in want.
         commands = [
-            "ip route 10.1.1.0/24 Management1",
-            "no ipv6 route 1000:10::/64 Ethernet1 67 tag 98",
-            "ipv6 route 1000:10::/64 Ethernet1 55",
+            "no ip route 10.0.0.0/8 10.1.1.1",
+            "no ip route 10.1.1.2/32 172.16.16.1",
+            "no ip route 10.10.0.0/16 172.16.16.1",
+            "ip route 10.10.0.0/16 172.16.16.2",
         ]
-        self.execute_module(changed=True, commands=commands)
+        self.execute_module(
+            changed=True,
+            commands=commands,
+            filename="eos_static_routes_issue532.cfg",
+        )
 
     def test_eos_static_routes_overridden(self):
         set_module_args(
