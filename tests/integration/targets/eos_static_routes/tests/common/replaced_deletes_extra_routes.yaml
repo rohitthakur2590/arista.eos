@@ -55,10 +55,10 @@
   arista.eos.eos_facts:
     gather_network_resources: static_routes
 
+# Global/static routes in EOS facts often omit the 'vrf' key; filter to default VRF only.
 - name: Verify device configuration - only 192.168.1.0/24 should remain
   ansible.builtin.set_fact:
     remaining_routes: "{{ ansible_facts.network_resources.static_routes |
-      # Global/static routes in EOS facts often omit the 'vrf' key entirely.
       rejectattr('vrf', 'defined') | list |
       map(attribute='address_families') | list |
       flatten |
