@@ -168,7 +168,7 @@ nodes:
     cpus:
     data_volume:
     hide_links: false
-    id: n1
+    id: n0
     image_definition:
     label: ext-conn-0
     node_definition: external_connector
