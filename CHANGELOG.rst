@@ -4,18 +4,16 @@ Arista Eos Collection Release Notes
 
 .. contents:: Topics
 
-v12.0.0
+v12.0.1
 =======
 
-Release Summary
----------------
+Bugfixes
+--------
 
-With this release, the minimum required version of `ansible.netcommon` for this collection is `>=8.1.0`. The last version known to be compatible with `ansible-core<=2.18.x` is ansible.netcommon `v8.0.1` and arista.eos `v11.0.0`.
+- Fix eos_vrf module to properly check existing interface configuration before making changes (https://github.com/ansible-collections/arista.eos/issues/546)
 
-Major Changes
--------------
-
-- Bumping `dependencies` of ansible.netcommon to `>=8.1.0`, since previous versions of the dependency had compatibility issues with `ansible-core>=2.19`.
+v12.0.0
+=======
 
 Bugfixes
 --------
@@ -360,7 +358,7 @@ Breaking Changes / Porting Guide
 New Modules
 -----------
 
-- eos_snmp_server - Manages snmp_server resource module
+- eos_snmp_server - Manages snmp\_server resource module
 
 v3.1.0
 ======
