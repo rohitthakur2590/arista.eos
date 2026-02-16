@@ -15,6 +15,16 @@ Bugfixes
 v12.0.0
 =======
 
+Release Summary
+---------------
+
+With this release, the minimum required version of `ansible.netcommon` for this collection is `>=8.1.0`. The last version known to be compatible with `ansible-core<=2.18.x` is ansible.netcommon `v8.0.1` and arista.eos `v11.0.0`.
+
+Major Changes
+-------------
+
+- Bumping `dependencies` of ansible.netcommon to `>=8.1.0`, since previous versions of the dependency had compatibility issues with `ansible-core>=2.19`.
+
 Bugfixes
 --------
 
