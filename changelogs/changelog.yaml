@@ -482,7 +482,7 @@ releases:
     - remove_2.6_ignores.yml
     - support_version_parameter.yaml
     modules:
-    - description: Manages snmp\_server resource module
+    - description: Manages snmp_server resource module
       name: eos_snmp_server
       namespace: ''
     release_date: '2021-12-07'

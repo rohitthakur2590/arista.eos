@@ -368,7 +368,7 @@ Breaking Changes / Porting Guide
 New Modules
 -----------
 
-- eos_snmp_server - Manages snmp\_server resource module
+- eos_snmp_server - Manages snmp_server resource module
 
 v3.1.0
 ======
